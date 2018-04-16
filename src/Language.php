@@ -1,98 +1,147 @@
 <?php
 
+declare(strict_types=1);
+
+namespace Vendi\HttpLanguageParser;
+
 final class Language
 {
-    public $language;
+    private $language;
 
-    public $variant;
+    private $variant;
 
-    public $weight;
+    //Spec says that 1 is the default
+    private $weight = 1.0;
 
-    public $original;
-
-    public $is_valid = false;
+    private $original;
 
     private $parsing_errors = null;
 
-    public function __construct(string $string = null)
+    public function get_variant() : ?string
     {
-        if($string)
-        {
-            $this->set_by_string($string);
+        if($this->get_last_error()){
+            return null;
         }
+        return $this->variant;
     }
 
-    public function set_by_string(string $string) : self
+    public function get_language() : ?string
     {
-        $this->original = $string;
+        if($this->get_last_error()){
+            return null;
+        }
+        return $this->language;
+    }
 
-        if(!$string)
-        {
-            $this->add_parsing_error('Null string');
-            return $this;
+    public function get_original() : ?string
+    {
+        return $this->original;
+    }
+
+    public function get_weight() : ?float
+    {
+        if($this->get_last_error()){
+            return null;
+        }
+        return $this->weight;
+    }
+
+    public function __construct()
+    {
+    }
+
+    public function with_string(string $string) : self
+    {
+        $obj = clone $this;
+
+        $obj->original = $string;
+
+        if (!$string) {
+            $obj->add_parsing_error('Null string');
+            return $obj;
         }
 
         $working_string = $string;
 
         $parts = explode(';', $string);
-        if(2 === count($parts))
-        {
-            if(!$this->maybe_set_weight($parts[1]))
-            {
-                $this->add_parsing_error('Weight parser failed');
-                return $this;
+        if (2 === count($parts)) {
+            $obj = $obj->with_specific_weight($parts[1]);
+
+            if ($obj->get_last_error()) {
+                $obj->add_parsing_error('Weight parser failed');
+                return $obj;
             }
         }
-        $working_string = $parts[0];
 
-        $parts = explode('-', $working_string);
-        if(2 === count($parts))
-        {
-            $this->variant = $parts[1];
+        $obj = $obj->with_language_and_maybe_variant($parts[0]);
+        if ($obj->get_last_error()) {
+            $obj->add_parsing_error('String parser failed');
+            return $obj;
         }
 
-        $this->language = $parts[0];
-
-        return $this;
+        return $obj;
     }
 
-    private function maybe_set_weight(string $weight_string) : bool
+    public function with_language_and_maybe_variant(string $string) : self
     {
-        if(!$weight_string)
-        {
-            $this->add_parsing_error('Empty weight string');
-            return false;
+        $obj = clone $this;
+
+        if (!$string) {
+            $obj->add_parsing_error('Null string');
+            return $obj;
+        }
+
+        $parts = explode('-', $string);
+        if (2 === count($parts)) {
+            $obj = $obj->with_variant($parts[1]);
+        }
+
+        $obj->language = mb_strtolower($parts[0]);
+
+        return $obj;
+    }
+
+    public function with_variant(string $string) : self
+    {
+        $obj = clone $this;
+        $obj->variant = mb_strtolower($string);
+        return $obj;
+    }
+
+    public function with_specific_weight(string $weight_string) : self
+    {
+        $obj = clone $this;
+
+        if (!$weight_string) {
+            $obj->add_parsing_error('Empty weight string');
+            return $obj;
         }
 
         $parts = explode('=', $weight_string);
-        if(2 !== count($parts))
-        {
-            $this->add_parsing_error('Unknown weight string: ' . $weight_string);
-            return false;
+        if (2 !== count($parts)) {
+            $obj->add_parsing_error('Unknown weight string: ' . $weight_string);
+            return $obj;
         }
 
-        if('q' !== $parts[0])
-        {
-            $this->add_parsing_error('Missing q in weight string');
-            return false;
+        if ('q' !== $parts[0]) {
+            $obj->add_parsing_error('Missing q in weight string');
+            return $obj;
         }
 
         $weight = $parts[1];
-        if(!preg_match('/[0-9\.]/', $weight))
-        {
-            $this->add_parsing_error('Invalid weight portion: ' . $weight);
-            return false;
+        if (!preg_match('/[0-9\.]/', $weight)) {
+            $obj->add_parsing_error('Invalid weight portion: ' . $weight);
+            return $obj;
         }
 
-        $this->weight = floatval($weight);
-        return true;
+        $obj->weight = floatval($weight);
+        return $obj;
     }
 
     public function get_last_error() : ?string
     {
-        if(is_array($this->parsing_errors) && count($this->parsing_errors) > 0)
-        {
-            return reset($this->parsing_errors);
+        if (is_array($this->parsing_errors) && count($this->parsing_errors) > 0) {
+            return end($this->parsing_errors);
         }
 
         return null;
@@ -103,10 +152,9 @@ final class Language
         return $this->parsing_errors;
     }
 
-    private function add_parsing_error(string $message)
+    public function add_parsing_error(string $message)
     {
-        if(!is_array($this->parsing_errors))
-        {
+        if (!is_array($this->parsing_errors)) {
             $this->parsing_errors = [];
         }
 
