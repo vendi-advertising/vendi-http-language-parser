@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "php": ">=7.0"
+        "php": ">=7.0",
+        "vendi-advertising/vendi-shared-utils": "^4.0"
     },
     "require-dev": {
         "symfony/var-dumper": "4.0.4",
