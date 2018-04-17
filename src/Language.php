@@ -2,16 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Vendi\HttpLanguageParser;
+namespace Vendi\HttpLanguageHelper;
 
 final class Language
 {
+    public const VARIANT_SIGNIFIER = '-';
+
+    public const WEIGHT_SIGNIFIER = ';';
+
+    public const WEIGHT_BEGIN = 'q';
+
+    public const WEIGHT_SEPARATOR = '=';
+
+    public const DEFAULT_WEIGHT = 1.0;
+
     private $language;
 
     private $variant;
 
     //Spec says that 1 is the default
-    private $weight = 1.0;
+    private $weight = self::DEFAULT_WEIGHT;
 
     private $original;
 
@@ -19,7 +29,7 @@ final class Language
 
     public function get_variant() : ?string
     {
-        if($this->get_last_error()){
+        if ($this->get_last_error()) {
             return null;
         }
         return $this->variant;
@@ -27,33 +37,34 @@ final class Language
 
     public function get_language() : ?string
     {
-        if($this->get_last_error()){
+        if ($this->get_last_error()) {
             return null;
         }
         return $this->language;
     }
 
-    public function get_original() : ?string
-    {
-        return $this->original;
-    }
-
     public function get_weight() : ?float
     {
-        if($this->get_last_error()){
+        //Weight should always be a number, even if absent, however we're
+        //return null to be consistent with get_variant() and get_language()
+        if ($this->get_last_error()) {
             return null;
         }
         return $this->weight;
     }
 
-    public function __construct()
+    public function get_original() : ?string
     {
+        //Always return original, even if there's an error
+        return $this->original;
     }
 
     public function with_string(string $string) : self
     {
+        //Immutable mode
         $obj = clone $this;
 
+        //Backup copy
         $obj->original = $string;
 
         if (!$string) {
@@ -61,9 +72,8 @@ final class Language
             return $obj;
         }
 
-        $working_string = $string;
-
-        $parts = explode(';', $string);
+        //Look for a weight
+        $parts = explode(self::WEIGHT_SIGNIFIER, $string);
         if (2 === count($parts)) {
             $obj = $obj->with_specific_weight($parts[1]);
 
@@ -73,6 +83,8 @@ final class Language
             }
         }
 
+        //Even if there was no weight, the first part of the array would hold
+        //the entire string anyway so that's what we're working with.
         $obj = $obj->with_language_and_maybe_variant($parts[0]);
         if ($obj->get_last_error()) {
             $obj->add_parsing_error('String parser failed');
@@ -84,6 +96,7 @@ final class Language
 
     public function with_language_and_maybe_variant(string $string) : self
     {
+        //Immutable mode
         $obj = clone $this;
 
         if (!$string) {
@@ -91,7 +104,8 @@ final class Language
             return $obj;
         }
 
-        $parts = explode('-', $string);
+        //Look for a variant signifier
+        $parts = explode(self::VARIANT_SIGNIFIER, $string);
         if (2 === count($parts)) {
             $obj = $obj->with_variant($parts[1]);
         }
@@ -117,13 +131,13 @@ final class Language
             return $obj;
         }
 
-        $parts = explode('=', $weight_string);
+        $parts = explode(self::WEIGHT_SEPARATOR, $weight_string);
         if (2 !== count($parts)) {
             $obj->add_parsing_error('Unknown weight string: ' . $weight_string);
             return $obj;
         }
 
-        if ('q' !== $parts[0]) {
+        if (self::WEIGHT_BEGIN !== $parts[0]) {
             $obj->add_parsing_error('Missing q in weight string');
             return $obj;
         }

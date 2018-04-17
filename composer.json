@@ -21,5 +21,8 @@
     },
     "config": {
         "optimize-autoloader": true
+    },
+    "autoload": {
+        "psr-4": {"Vendi\\HttpLanguageHelper\\": "src/"}
     }
 }

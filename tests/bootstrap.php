@@ -13,7 +13,7 @@ spl_autoload_register(
                             //PSR-4 compliant autoloader
                             //See http://www.php-fig.org/psr/psr-4/
                             $prefixes = [
-                                                'Vendi\\HttpLanguageParser' => $dir . '/src/',
+                                                'Vendi\\HttpLanguageHelper' => $dir . '/src/',
                                             ];
                             foreach ($prefixes as $prefix => $base_dir) {
                                 // does the class use the namespace prefix?
