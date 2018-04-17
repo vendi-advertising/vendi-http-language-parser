@@ -18,7 +18,8 @@
         "sensiolabs/security-checker": "^4.1",
         "jakub-onderka/PHP-Parallel-Lint": "dev-master",
         "friendsofphp/php-cs-fixer": "^2.10.2",
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "*",
+        "scrutinizer/ocular": "*"
     },
     "config": {
         "optimize-autoloader": true
