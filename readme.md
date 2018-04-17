@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/vendi-advertising/vendi-http-language-parser.svg?branch=master)](https://travis-ci.org/vendi-advertising/vendi-http-language-parser)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/vendi-advertising/vendi-http-language-parser/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/vendi-advertising/vendi-http-language-parser/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/vendi-advertising/vendi-http-language-parser/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/vendi-advertising/vendi-http-language-parser/?branch=master)
+[![codecov](https://codecov.io/gh/vendi-advertising/vendi-http-language-parser/branch/master/graph/badge.svg)](https://codecov.io/gh/vendi-advertising/vendi-http-language-parser)
 
 
 ## Installation
