@@ -1,0 +1,30 @@
+language: php
+
+branches:
+  only:
+    - master
+
+php:
+  - 7.1
+  - 7.2
+  - nightly
+
+before_script:
+  - composer self-update
+  - composer update
+  - composer install --dev
+
+script:
+  - cd $TRAVIS_BUILD_DIR
+  - |
+    if [[ "$TRAVIS_PHP_VERSION" == "7.1" ]] ; then
+        ./vendor/bin/phpunit -c phpunit.xml --coverage-clover=coverage.xml
+        ./vendor/bin/ocular code-coverage:upload --format=php-clover coverage.xml
+    else
+        ./vendor/bin/phpunit -c phpunit.xml
+    fi
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+#Borrowed from https://github.com/humanmade/backupwordpress/blob/master/.travis.yml
