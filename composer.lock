@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3b8f1c4954f607589f26f663075d9d04",
+    "content-hash": "670db2c4478edcbd708bde718df43f65",
     "packages": [
         {
             "name": "vendi-advertising/vendi-shared-utils",
@@ -2667,7 +2667,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.0"
+        "php": ">=7.1"
     },
     "platform-dev": []
 }
