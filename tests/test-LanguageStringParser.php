@@ -14,15 +14,15 @@ use Vendi\HttpLanguageHelper\LanguageStringParser;
 class test_LanguageStringParser extends TestCase
 {
     /**
-     * @covers \Vendi\HttpLanguageHelper\LanguageStringParser::__construct
+     * @covers \Vendi\HttpLanguageHelper\LanguageStringParser::create_empty_parser
      * @covers \Vendi\HttpLanguageHelper\LanguageStringParser::get_languages
      */
-    public function test____construct()
+    public function test__create_empty_parser()
     {
-        $parser = new LanguageStringParser('');
+        $parser = LanguageStringParser::create_empty_parser();
         $this->assertCount(0, $parser->get_languages());
 
-        $parser = new LanguageStringParser('fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5');
+        $parser = LanguageStringParser::create_from_string('fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5');
         $this->assertCount(5, $parser->get_languages());
 
         $langs = $parser->get_languages();
@@ -40,7 +40,7 @@ class test_LanguageStringParser extends TestCase
     public function test__get_languages_ordered()
     {
         //Same string as above but shuffled around a bit
-        $parser = new LanguageStringParser('en;q=0.8, fr;q=0.9, de;q=0.7, *;q=0.5, fr-CH');
+        $parser = LanguageStringParser::create_from_string('en;q=0.8, fr;q=0.9, de;q=0.7, *;q=0.5, fr-CH');
         $langs = $parser->get_languages_ordered();
         $this->assertCount(5, $langs);
 
@@ -52,15 +52,15 @@ class test_LanguageStringParser extends TestCase
     }
 
     /**
-     * @covers \Vendi\HttpLanguageHelper\LanguageStringParser::__construct
+     * @covers \Vendi\HttpLanguageHelper\LanguageStringParser::create_empty_parser
      * @covers \Vendi\HttpLanguageHelper\LanguageStringParser::get_languages
      */
-    public function test____construct_with_invalid()
+    public function test__create_empty_parser_with_invalid()
     {
-        $parser = new LanguageStringParser('');
+        $parser = LanguageStringParser::create_empty_parser();
         $this->assertCount(0, $parser->get_languages());
 
-        $parser = new LanguageStringParser('fr-CH, fr;b=c');
+        $parser = LanguageStringParser::create_from_string('fr-CH, fr;b=c');
         $this->assertCount(1, $parser->get_languages());
     }
 
@@ -77,7 +77,7 @@ class test_LanguageStringParser extends TestCase
      */
     public function test___compare_languages_by_weight_only()
     {
-        $parser = new LanguageStringParser('');
+        $parser = LanguageStringParser::create_empty_parser();
         $this->assertSame(0, $parser->_compare_languages_by_weight_only(new Language(), new Language()));
         $this->assertSame(0, $parser->_compare_languages_by_weight_only((new Language())->with_specific_weight('q=0.5'), (new Language())->with_specific_weight('q=0.5')));
         $this->assertSame(-1, $parser->_compare_languages_by_weight_only((new Language())->with_specific_weight('q=0.6'), (new Language())->with_specific_weight('q=0.5')));
@@ -89,7 +89,7 @@ class test_LanguageStringParser extends TestCase
      */
     public function test___compare_languages_by_wildcard()
     {
-        $parser = new LanguageStringParser('');
+        $parser = LanguageStringParser::create_empty_parser();
         $this->assertSame(0, $parser->_compare_languages_by_wildcard(new Language(), new Language()));
 
         //Same language
@@ -110,7 +110,7 @@ class test_LanguageStringParser extends TestCase
      */
     public function test___compare_languages_by_variant()
     {
-        $parser = new LanguageStringParser('');
+        $parser = LanguageStringParser::create_empty_parser();
         $this->assertSame(0, $parser->_compare_languages_by_variant(new Language(), new Language()));
 
         //No variants
@@ -133,7 +133,7 @@ class test_LanguageStringParser extends TestCase
      */
     public function test___compare_languages(int $result, string $a, string $b)
     {
-        $parser = new LanguageStringParser('');
+        $parser = LanguageStringParser::create_empty_parser();
         $this->assertSame(
                             $result,
                             $parser->_compare_languages(

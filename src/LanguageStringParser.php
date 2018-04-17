@@ -13,18 +13,38 @@ final class LanguageStringParser
         return $this->languages;
     }
 
-    public function __construct(string $string)
+    private function __construct()
     {
-        $parts = explode(',', $string);
-        foreach ($parts as $part) {
+        //NOOP
+    }
+
+    public static function create_empty_parser() : self
+    {
+        return new self();
+    }
+
+    public static function create_from_string(string $languages) : self
+    {
+        $parts = explode(',', $languages);
+
+        return self::create_from_array($parts);
+    }
+
+    public static function create_from_array(array $languages) : self
+    {
+        $obj = new self();
+
+        foreach ($languages as $part) {
             $string = trim($part);
             if ($string) {
                 $lang = (new Language)->with_string($string);
                 if (!$lang->get_last_error()) {
-                    $this->languages[] = $lang;
+                    $obj->languages[] = $lang;
                 }
             }
         }
+
+        return $obj;
     }
 
     public function get_languages_ordered() : array
