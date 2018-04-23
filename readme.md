@@ -59,7 +59,7 @@ This static method will return the first value from the array `$one_or_more_serv
     );
 
 #### Examples
-    use Vendi\HttpLanguageHelper\LanguageStringParser;
+    use Vendi\HttpLanguageHelper\LanguageHelper;
 
     $lang = LanguageHelper::get_server_language_from_client_string( 'en', [ 'en', 'de' ], 'en;q=0.8, fr;q=0.9, de;q=0.7, *;q=0.5, fr-CH' );
     //$lang = 'en'  //English is weighted more than German
